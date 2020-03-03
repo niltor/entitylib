@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApp.Data.Entity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace WebApp
 {
@@ -42,8 +43,9 @@ namespace WebApp
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<AppUser, AppRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultUI()
                 .AddDefaultTokenProviders();
+                //.AddUserStore<UserStore<AppUser, AppRole, ApplicationDbContext, Guid>>()
+                //.AddRoleStore<RoleStore<AppRole, ApplicationDbContext, Guid>>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
