@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using WebApp.Areas.Services;
 using WebApp.Areas.Options;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace WebApp
 {
@@ -42,7 +44,6 @@ namespace WebApp
             });
 
             services.Configure<MailOptions>(Configuration.GetSection("Mail"));
-
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -50,6 +51,15 @@ namespace WebApp
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            // ÅäÖÃÊÚÈ¨²ßÂÔ
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("User", policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.NameIdentifier);
+                });
+            });
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IEmailSender, EmailSenderService>();
             services.AddControllersWithViews();
             services.AddRazorPages();

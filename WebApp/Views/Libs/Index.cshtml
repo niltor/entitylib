@@ -30,19 +30,22 @@
         {
             <tr>
                 <td>
-                    <span class="text-primary">
+                    <span class="badge badge-primary">
                         @item.Language
                     </span>
-                    <span class="text-secondary">
-                        @item.IsValid
-                    </span>
-                    @Html.DisplayFor(modelItem => item.Namespace)
+                    <a asp-controller="Entities" asp-action="Index" class="text-dark">
+                        @Html.DisplayFor(modelItem => item.Namespace)
+                    </a>
+                    @if (item.IsValid)
+                    {
+                        <span>✔</span>
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CreatedTime)
+                    @item.CreatedTime.ToLocalTime().ToString("yy-MM-dd HH:mm")
                 </td>
 
                 <td>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,18 +11,16 @@ using WebApp.Data.Entity;
 
 namespace WebApp.Controllers
 {
-    public class LibsController : Controller
+    public class LibsController : UserBaseController
     {
-        private readonly ApplicationDbContext _context;
-
-        public LibsController(ApplicationDbContext context)
+        public LibsController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context) : base(httpContextAccessor, context)
         {
-            _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Libs.ToListAsync());
+            var result = await _context.Libs.Where(l => l.User.Id == UserId).ToListAsync();
+            return View(result);
         }
 
         public async Task<IActionResult> Details(Guid? id)
@@ -32,6 +31,7 @@ namespace WebApp.Controllers
             }
 
             var lib = await _context.Libs
+                .Where(l => l.User.Id == UserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (lib == null)
             {
@@ -52,35 +52,37 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(lib);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var user = await _context.Users.FindAsync(UserId);
+                if (user != null)
+                {
+                    lib.User = user;
+                    _context.Add(lib);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    return NotFound("not exist user");
+                }
             }
             return View(lib);
         }
 
-        // GET: Libs/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var lib = await _context.Libs.FindAsync(id);
-            if (lib == null)
-            {
-                return NotFound();
-            }
+            var lib = await _context.Libs.Where(l => l.User.Id == UserId).SingleOrDefaultAsync();
+            if (lib == null) return NotFound();
             return View(lib);
+
         }
 
-        // POST: Libs/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Namespace,Description,Language,IsValid,Id,CreatedTime,UpdatedTime")] Lib lib)
+        public async Task<IActionResult> Edit(Guid id, Lib lib)
         {
             if (id != lib.Id)
             {
@@ -89,28 +91,20 @@ namespace WebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(lib);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LibExists(lib.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentLib = _context.Libs.Where(l => l.User.Id == UserId).FirstOrDefault();
+                if (currentLib == null) return NotFound();
+                currentLib.Namespace = lib.Namespace;
+                currentLib.Description = lib.Description;
+                currentLib.Language = lib.Language;
+                currentLib.IsValid = lib.IsValid;
+
+                _context.Update(currentLib);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(lib);
         }
 
-        // GET: Libs/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -119,6 +113,7 @@ namespace WebApp.Controllers
             }
 
             var lib = await _context.Libs
+                .Where(l => l.User.Id == UserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (lib == null)
             {
@@ -128,12 +123,12 @@ namespace WebApp.Controllers
             return View(lib);
         }
 
-        // POST: Libs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var lib = await _context.Libs.FindAsync(id);
+            var lib = _context.Libs.Where(l => l.User.Id == UserId).FirstOrDefault();
+            if (lib == null) return NotFound();
             _context.Libs.Remove(lib);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

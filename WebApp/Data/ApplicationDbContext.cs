@@ -9,6 +9,8 @@ namespace WebApp.Data
 {
     public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
+        //public DbSet<AppUser> AppUsers { get; set; }
+        //public DbSet<AppRole> AppRoles { get; set; }
         public DbSet<Entity.Entity> Entities { get; set; }
         public DbSet<Lib> Libs { get; set; }
 
