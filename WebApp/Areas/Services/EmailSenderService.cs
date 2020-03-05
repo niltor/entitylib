@@ -16,7 +16,7 @@ namespace WebApp.Areas.Services
     public class EmailSenderService : IEmailSender
     {
         readonly string _apiKey;
-        readonly string fromEmail = "no-response@vof.media";
+        readonly string fromEmail = "no-response@entitylib.com";
         readonly IWebHostEnvironment _env;
         public EmailSenderService(IOptions<MailOptions> options, IWebHostEnvironment env)
         {
@@ -24,9 +24,17 @@ namespace WebApp.Areas.Services
             _env = env;
         }
 
-        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            throw new NotImplementedException();
+
+            var response = await SendAsync(fromEmail, email, subject, null, htmlMessage, "EntityLib");
+            if (response.StatusCode != HttpStatusCode.OK
+                && response.StatusCode != HttpStatusCode.Accepted)
+            {
+                // TODO:记录错误信息
+                var result = await response.Body.ReadAsStringAsync();
+
+            }
         }
 
         /// <summary>
