@@ -14,6 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApp.Data.Entity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using WebApp.Areas.Services;
+using WebApp.Areas.Options;
 
 namespace WebApp
 {
@@ -38,15 +41,16 @@ namespace WebApp
                 options.SignIn.RequireConfirmedEmail = true;
             });
 
+            services.Configure<MailOptions>(Configuration.GetSection("Mail"));
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<AppUser, AppRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-                //.AddUserStore<UserStore<AppUser, AppRole, ApplicationDbContext, Guid>>()
-                //.AddRoleStore<RoleStore<AppRole, ApplicationDbContext, Guid>>();
 
+            services.AddTransient<IEmailSender, EmailSenderService>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
