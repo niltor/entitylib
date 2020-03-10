@@ -19,13 +19,18 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Entities
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Guid? libId = null)
         {
-            return View(await _context.Entities.ToListAsync());
+            if (libId == null)
+            {
+                return NotFound();
+            }
+            var entities = await _context.Entities
+                .Where(e => e.Lib.Id == libId)
+                .ToListAsync();
+            return View(entities);
         }
 
-        // GET: Entities/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -43,30 +48,33 @@ namespace WebApp.Controllers
             return View(entity);
         }
 
-        // GET: Entities/Create
-        public IActionResult Create()
+        public IActionResult Create(Guid? libId)
         {
+            if (libId == null)
+            {
+                return NotFound();
+            }
+            var lib = _context.Libs.Find(libId);
+            ViewBag.lib = lib;
             return View();
         }
 
-        // POST: Entities/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,Content,Id,CreatedTime,UpdatedTime")] Entity entity)
+        public async Task<IActionResult> Create(Guid? libId, [Bind("Name,Description,Content,Id")] Entity entity)
         {
             if (ModelState.IsValid)
             {
                 entity.Id = Guid.NewGuid();
+                var lib = _context.Libs.Find(libId);
+                entity.Lib = lib;
                 _context.Add(entity);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { libId });
             }
             return View(entity);
         }
 
-        // GET: Entities/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -82,9 +90,6 @@ namespace WebApp.Controllers
             return View(entity);
         }
 
-        // POST: Entities/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, [Bind("Name,Description,Content,Id,CreatedTime,UpdatedTime")] Entity entity)
@@ -117,7 +122,6 @@ namespace WebApp.Controllers
             return View(entity);
         }
 
-        // GET: Entities/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -135,7 +139,6 @@ namespace WebApp.Controllers
             return View(entity);
         }
 
-        // POST: Entities/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

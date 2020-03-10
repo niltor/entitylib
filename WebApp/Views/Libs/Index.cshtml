@@ -33,7 +33,7 @@
                     <span class="badge badge-primary">
                         @item.Language
                     </span>
-                    <a asp-controller="Entities" asp-action="Index" class="text-dark">
+                    <a asp-controller="Entities" asp-action="Index" asp-route-libId="@item.Id" class="text-dark">
                         @Html.DisplayFor(modelItem => item.Namespace)
                     </a>
                     @if (item.IsValid)

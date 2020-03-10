@@ -2,15 +2,20 @@
 
 @{
     ViewData["Title"] = "Create";
+    var lib = ViewBag.lib as Lib;
 }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="~/js/vs/editor/editor.main.css" rel="stylesheet" />
+</head>
 
-<h1>Create</h1>
-
-<h4>Entity</h4>
+<h4>Add Entity</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+    <div class="col-12 col-lg-6">
+        <form asp-action="Create" asp-route-libId="@lib.Id" id="form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -24,21 +29,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
+                <div id="content"></div>
+                <textarea asp-for="Content" style="display:none" id="contentArea"></textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CreatedTime" class="control-label"></label>
-                <input asp-for="CreatedTime" class="form-control" />
-                <span asp-validation-for="CreatedTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedTime" class="control-label"></label>
-                <input asp-for="UpdatedTime" class="form-control" />
-                <span asp-validation-for="UpdatedTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="button" value="Add" class="btn btn-primary" id="submit" />
             </div>
         </form>
     </div>
@@ -50,4 +46,27 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>var require = { paths: { 'vs': '/js/vs' } };</script>
+    <script type="text/javascript" src="~/js/vs/loader.js"></script>
+    <script>
+        "use strict";
+        var editorContainer = document.getElementById('content');
+        editorContainer.style.minHeight = "600px";
+        var editor = null;
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(editorContainer, {
+                theme: 'vs-dark',
+                language: '@lib.Language',
+                minimap: { enabled: false }
+            });
+        });
+
+        $("#submit").click(function () {
+            event.preventDefault();
+            const value = editor.getValue();
+            $("#contentArea").text(value);
+            $("#form").submit();
+        })
+
+    </script>
 }
