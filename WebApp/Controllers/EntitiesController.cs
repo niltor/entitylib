@@ -25,6 +25,7 @@ namespace WebApp.Controllers
         {
             if (libId == null)
             {
+
                 return NotFound();
             }
             LibId = LibId;
@@ -86,11 +87,15 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var entity = await _context.Entities.FindAsync(id);
+            var entity = await _context.Entities
+                .Include(e => e.Lib)
+                .SingleOrDefaultAsync(e => e.Id == id);
             if (entity == null)
             {
                 return NotFound();
             }
+            LibId = entity.Lib.Id;
+            TempData.Keep();
             return View(entity);
         }
 
@@ -121,7 +126,7 @@ namespace WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { libId = LibId });
             }
             return View(entity);
         }
