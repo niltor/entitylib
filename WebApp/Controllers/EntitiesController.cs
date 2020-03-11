@@ -13,6 +13,8 @@ namespace WebApp.Controllers
     public class EntitiesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        [TempData]
+        public Guid? LibId { get; set; }
 
         public EntitiesController(ApplicationDbContext context)
         {
@@ -25,6 +27,7 @@ namespace WebApp.Controllers
             {
                 return NotFound();
             }
+            LibId = LibId;
             var entities = await _context.Entities
                 .Where(e => e.Lib.Id == libId)
                 .ToListAsync();
@@ -39,6 +42,7 @@ namespace WebApp.Controllers
             }
 
             var entity = await _context.Entities
+                .Include(e => e.Lib)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (entity == null)
             {

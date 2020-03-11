@@ -34,7 +34,7 @@
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="button" value="Add" class="btn btn-primary" id="submit" />
+                <button type="submit" class="btn btn-primary" id="submit">Add</button>
             </div>
         </form>
     </div>
@@ -60,13 +60,13 @@
                 minimap: { enabled: false }
             });
         });
-
-        $("#submit").click(function () {
-            event.preventDefault();
+    </script>
+    <script>
+        
+        $("#submit").click(function (event) {
             const value = editor.getValue();
             $("#contentArea").text(value);
-            $("#form").submit();
+            return true;
         })
-
     </script>
 }

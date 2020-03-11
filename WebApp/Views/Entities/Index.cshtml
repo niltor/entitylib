@@ -19,15 +19,10 @@
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.CreatedTime)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedTime)
-            </th>
-            <th></th>
+
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -41,13 +36,7 @@
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Content)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UpdatedTime)
+                    @item.CreatedTime.ToLocalTime().ToString("yy-MM-dd HH:mm")
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

@@ -12,7 +12,5 @@ namespace WebApp.Data.Entity
         public Guid Id { get; set; }
         public DateTimeOffset CreatedTime { get; set; } = DateTimeOffset.Now;
         public DateTimeOffset? UpdatedTime { get; set; }
-
-
     }
 }

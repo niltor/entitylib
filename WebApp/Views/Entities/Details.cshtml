@@ -1,48 +1,72 @@
 ﻿@model WebApp.Data.Entity.Entity
-
 @{
     ViewData["Title"] = "Details";
+    var lib = Model.Lib;
 }
-
-<h1>Details</h1>
-
+<head>
+    <link href="~/js/vs/editor/editor.main.css" rel="stylesheet" />
+</head>
 <div>
-    <h4>Entity</h4>
+    <h4>Entity Detail</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-        <dt class = "col-sm-2">
+
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.CreatedTime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CreatedTime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.UpdatedTime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.UpdatedTime)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+        <dd class="col-sm-10">
+            <div id="content"></div>
         </dd>
     </dl>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-id="@Model.Lib.Id">Back to List</a>
 </div>
+
+
+@section Scripts{
+
+    <script>var require = { paths: { 'vs': '/js/vs' } };</script>
+    <script type="text/javascript" src="~/js/vs/loader.js"></script>
+    <script>
+        "use strict";
+        const editorContainer = document.getElementById('content');
+        editorContainer.style.minHeight = "600px";
+        let editor = null;
+        const content = `@Html.Raw(Model.Content)`;
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(editorContainer, {
+                theme: 'vs-dark',
+                language: '@lib.Language',
+                value: content,
+                minimap: { enabled: false }
+            });
+        });
+    </script>
+
+}
