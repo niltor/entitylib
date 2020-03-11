@@ -139,6 +139,7 @@ namespace WebApp.Controllers
             }
 
             var entity = await _context.Entities
+                .Include(e => e.Lib)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (entity == null)
             {
@@ -152,10 +153,12 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var entity = await _context.Entities.FindAsync(id);
+            var entity = await _context.Entities
+                .Include(e => e.Lib)
+                .SingleOrDefaultAsync(e => e.Id == id);
             _context.Entities.Remove(entity);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { libId = entity.Lib.Id });
         }
 
         private bool EntityExists(Guid id)
